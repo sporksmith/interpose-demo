@@ -11,21 +11,18 @@ show_cmd "cat ./call_write.c"
 
 echo "Output of call_write:\n"
 show_cmd "./call_write"
-echo
 
 echo "Suppose we want to double all output to stdout."
 echo "All of the functions in call_write ultimately make a write syscall, so we interpose the syscall function directly:"
 show_cmd "cat ./interpose.c"
-echo
 
 echo "Unfortunately, it turns out that the libc implementations of these functions make inlined syscalls,"
 echo "so this only successfully interposes on and doubles the actual call to syscall:"
 show_cmd 'LD_PRELOAD=$PWD/libinterpose.so ./call_write'
 
 echo "We can fix this by using a patched libc that replaces inlined syscalls with calls to the syscall function,"
-echo "and also LD_PRELOAD'ing that. Note that the doubling happens on several lines at a time, because the libc"
-echo "functions buffer individual writes in memory; the write syscall and doubling happens when the buffer is flushed"
-echo "rather than on the individual function calls."
+echo "and also LD_PRELOAD'ing that. Note that the functions that operate on the stdout file stream actually"
+echo "write to an in-memory buffer. A 'write' syscall happens at the end when the whole buffer is flushed."
 show_cmd 'LD_PRELOAD=$PWD/libinterpose.so:$PWD/libc.so ./call_write'
 
 #echo "Running call_write with interposition:"
