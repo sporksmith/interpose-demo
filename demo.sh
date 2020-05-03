@@ -12,7 +12,7 @@ echo
 echo "Suppose we have a program, call_write.c, that writes some strings to stdout:"
 show_cmd "cat ./call_write.c"
 
-echo "Output of call_write:\n"
+echo "Output of call_write:"
 show_cmd "./call_write"
 
 echo "Suppose we want to double all output to stdout."
