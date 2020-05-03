@@ -23,7 +23,9 @@ echo "so this only successfully interposes on and doubles the actual call to sys
 show_cmd 'LD_PRELOAD=$PWD/libinterpose.so ./call_write'
 
 echo "We can fix this by using a patched libc that replaces inlined syscalls with calls to the syscall function,"
-echo "and also LD_PRELOAD'ing that:"
+echo "and also LD_PRELOAD'ing that. Note that the doubling happens on several lines at a time, because the libc"
+echo "functions buffer individual writes in memory; the write syscall and doubling happens when the buffer is flushed"
+echo "rather than on the individual function calls."
 show_cmd 'LD_PRELOAD=$PWD/libinterpose.so:$PWD/libc.so ./call_write'
 
 #echo "Running call_write with interposition:"
