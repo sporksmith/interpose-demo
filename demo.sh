@@ -1,9 +1,10 @@
 #!/bin/bash
 
 show_cmd () {
+  echo
   echo "  \$ $1"
-  #bash -c "$1 | sed 's/^/  /'"
   bash -c "$1" | sed 's/^/  /'
+  echo
 }
 
 echo "Suppose we have a program, call_write.c, that writes some strings to stdout:"
