@@ -6,17 +6,17 @@
 #include <string.h>
 
 int main(int argc, char **argv) {
-    const char* msg = "Calling syscall\n";
+    const char* msg = "syscall\n";
     syscall(SYS_write, STDOUT_FILENO, msg, strlen(msg));
 
-    msg = "Calling write\n";
+    msg = "write\n";
     write(STDOUT_FILENO, msg, strlen(msg));
 
-    msg = "Calling fwrite\n";
+    msg = "fwrite\n";
     fwrite(msg, 1, strlen(msg), stdout);
 
-    printf("Calling printf\n");
-    fprintf(stdout, "Calling fprintf\n");
+    printf("printf\n");
+    fprintf(stdout, "fprintf\n");
 
     putc('!', stdout);
     putc('\n', stdout);

@@ -11,30 +11,30 @@ Suppose we have a program, call_write.c, that writes some strings to stdout:
     #include <string.h>
     
     int main(int argc, char **argv) {
-        const char* msg = "Calling syscall\n";
+        const char* msg = "syscall\n";
         syscall(SYS_write, STDOUT_FILENO, msg, strlen(msg));
     
-        msg = "Calling write\n";
+        msg = "write\n";
         write(STDOUT_FILENO, msg, strlen(msg));
     
-        msg = "Calling fwrite\n";
+        msg = "fwrite\n";
         fwrite(msg, 1, strlen(msg), stdout);
     
-        printf("Calling printf\n");
-        fprintf(stdout, "Calling fprintf\n");
+        printf("printf\n");
+        fprintf(stdout, "fprintf\n");
     
         putc('!', stdout);
         putc('\n', stdout);
     }
 
-Output of call_write:\n
+Output of call_write:
 
     $ ./call_write
-    Calling syscall
-    Calling write
-    Calling fwrite
-    Calling printf
-    Calling fprintf
+    syscall
+    write
+    fwrite
+    printf
+    fprintf
     !
 
 Suppose we want to double all output to stdout.
@@ -103,12 +103,12 @@ Unfortunately, it turns out that the libc implementations of these functions mak
 so this only successfully interposes on and doubles the actual call to syscall:
 
     $ LD_PRELOAD=$PWD/libinterpose.so ./call_write
-    Calling syscall
-    Calling syscall
-    Calling write
-    Calling fwrite
-    Calling printf
-    Calling fprintf
+    syscall
+    syscall
+    write
+    fwrite
+    printf
+    fprintf
     !
 
 We can fix this by using a patched libc that replaces inlined syscalls with calls to the syscall function,
@@ -116,16 +116,16 @@ and also LD_PRELOAD'ing that. Note that the functions that operate on the stdout
 write to an in-memory buffer. A 'write' syscall happens at the end when the whole buffer is flushed.
 
     $ LD_PRELOAD=$PWD/libinterpose.so:$PWD/glibc-build/libc.so ./call_write
-    Calling syscall
-    Calling syscall
-    Calling write
-    Calling write
-    Calling fwrite
-    Calling printf
-    Calling fprintf
+    syscall
+    syscall
+    write
+    write
+    fwrite
+    printf
+    fprintf
     !
-    Calling fwrite
-    Calling printf
-    Calling fprintf
+    fwrite
+    printf
+    fprintf
     !
 
