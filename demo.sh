@@ -1,7 +1,30 @@
 #!/bin/bash
 
-echo "Running call_write without interposition:"
-./call_write
+show_cmd () {
+  echo "  \$ $1"
+  #bash -c "$1 | sed 's/^/  /'"
+  bash -c "$1" | sed 's/^/  /'
+}
 
-echo "Running call_write with interposition:"
-LD_PRELOAD=$PWD/libinterpose.so ./call_write
+echo "Suppose we have a program, call_write.c, that writes some strings to stdout:"
+show_cmd "cat ./call_write.c"
+
+echo "Output of call_write:\n"
+show_cmd "./call_write"
+echo
+
+echo "Suppose we want to double all output to stdout."
+echo "All of the functions in call_write ultimately make a write syscall, so we interpose the syscall function directly:"
+show_cmd "cat ./interpose.c"
+echo
+
+echo "Unfortunately, it turns out that the libc implementations of these functions make inlined syscalls,"
+echo "so this only successfully interposes on and doubles the actual call to syscall:"
+show_cmd 'LD_PRELOAD=$PWD/libinterpose.so ./call_write'
+
+echo "We can fix this by using a patched libc that replaces inlined syscalls with calls to the syscall function,"
+echo "and also LD_PRELOAD'ing that:"
+show_cmd 'LD_PRELOAD=$PWD/libinterpose.so:$PWD/libc.so ./call_write'
+
+#echo "Running call_write with interposition:"
+#LD_PRELOAD=$PWD/libinterpose.so ./call_write
