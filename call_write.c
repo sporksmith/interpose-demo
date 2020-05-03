@@ -17,7 +17,8 @@ int main(int argc, char **argv) {
 
     printf("printf\n");
     fprintf(stdout, "fprintf\n");
-
+    puts("puts");
+    fputs("fputs\n", stdout);
     putc('!', stdout);
     putc('\n', stdout);
 }

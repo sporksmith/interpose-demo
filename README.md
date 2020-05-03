@@ -22,7 +22,8 @@ Suppose we have a program, call_write.c, that writes some strings to stdout:
     
         printf("printf\n");
         fprintf(stdout, "fprintf\n");
-    
+        puts("puts");
+        fputs("fputs\n", stdout);
         putc('!', stdout);
         putc('\n', stdout);
     }
@@ -35,6 +36,8 @@ Output of call_write:
     fwrite
     printf
     fprintf
+    puts
+    fputs
     !
 
 Suppose we want to double all output to stdout.
@@ -109,6 +112,8 @@ so this only successfully interposes on and doubles the actual call to syscall:
     fwrite
     printf
     fprintf
+    puts
+    fputs
     !
 
 We can fix this by using a patched libc that replaces inlined syscalls with calls to the syscall function,
@@ -123,9 +128,13 @@ write to an in-memory buffer. A 'write' syscall happens at the end when the whol
     fwrite
     printf
     fprintf
+    puts
+    fputs
     !
     fwrite
     printf
     fprintf
+    puts
+    fputs
     !
 
