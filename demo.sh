@@ -23,7 +23,7 @@ show_cmd 'LD_PRELOAD=$PWD/libinterpose.so ./call_write'
 echo "We can fix this by using a patched libc that replaces inlined syscalls with calls to the syscall function,"
 echo "and also LD_PRELOAD'ing that. Note that the functions that operate on the stdout file stream actually"
 echo "write to an in-memory buffer. A 'write' syscall happens at the end when the whole buffer is flushed."
-show_cmd 'LD_PRELOAD=$PWD/libinterpose.so:$PWD/libc.so ./call_write'
+show_cmd 'LD_PRELOAD=$PWD/libinterpose.so:$PWD/glibc-build/libc.so ./call_write'
 
 #echo "Running call_write with interposition:"
 #LD_PRELOAD=$PWD/libinterpose.so ./call_write
