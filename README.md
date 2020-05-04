@@ -117,7 +117,13 @@ so this only successfully interposes on and doubles the actual call to syscall:
     !
 
 We can fix this by using a patched libc that replaces inlined syscalls with calls to the syscall function,
-and also LD_PRELOAD'ing that. Note that the functions that operate on the stdout file stream actually
+and also LD_PRELOAD'ing that. It turns out we primarly just need to
+[redefine some syscall macros](https://github.com/sporksmith/glibc/commit/6d667159940450ba1ce40b5ea00e8a88a4f7fe21).
+When using the library as an LD_PRELOAD I initially got some crashes in code that tries to do a dynamic symbol lookup
+to determine whether it's not the primary libc in use; I worked around by effectively
+[hard-coding the answer to "yes"](https://github.com/sporksmith/glibc/commit/575ea9f2412905a323cd0c3c380f003bb9e61e67)
+
+Note that the functions that operate on the stdout file stream actually
 write to an in-memory buffer. A 'write' syscall happens at the end when the whole buffer is flushed.
 
     $ LD_PRELOAD=$PWD/libinterpose.so:$PWD/glibc-build/libc.so ./call_write
