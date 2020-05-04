@@ -41,7 +41,7 @@ Output of call_write:
     !
 
 Suppose we want to double all output to stdout.
-All of the functions in call_write ultimately make a write syscall, so we interpose the syscall function directly:
+All of the functions in call_write ultimately make a write syscall, so we interpose the syscall function directly.
 
     $ cat ./interpose.c
     #define _GNU_SOURCE
@@ -102,7 +102,7 @@ All of the functions in call_write ultimately make a write syscall, so we interp
     }
     
 
-Unfortunately, it turns out that the libc implementations of these functions make inlined syscalls,
+Unfortunately, it turns out that the libc implementations of these functions make *inlined* syscalls,
 so this only successfully interposes on and doubles the actual call to syscall:
 
     $ LD_PRELOAD=$PWD/libinterpose.so ./call_write
@@ -123,9 +123,6 @@ When using the library as an LD_PRELOAD I initially got some crashes in code tha
 to determine whether it's not the primary libc in use; I worked around by effectively
 [hard-coding the answer to "yes"](https://github.com/sporksmith/glibc/commit/575ea9f2412905a323cd0c3c380f003bb9e61e67)
 
-Note that the functions that operate on the stdout file stream actually
-write to an in-memory buffer. A 'write' syscall happens at the end when the whole buffer is flushed.
-
     $ LD_PRELOAD=$PWD/libinterpose.so:$PWD/glibc-build/libc.so ./call_write
     syscall
     syscall
@@ -144,3 +141,6 @@ write to an in-memory buffer. A 'write' syscall happens at the end when the whol
     fputs
     !
 
+You may wonder why we dont see the two, e.g. `fwrite` outputs directly next to each-other.
+This is because the functions that operate on the stdout `FILE*` stream, rather than directly on its file descriptor,
+write to an in-memory buffer. i.e. the corresponding writes get batched into a single `write` syscall.

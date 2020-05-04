@@ -16,10 +16,10 @@ echo Output of call_write:
 show_cmd "./call_write"
 
 echo Suppose we want to double all output to stdout.
-echo All of the functions in call_write ultimately make a write syscall, so we interpose the syscall function directly:
+echo All of the functions in call_write ultimately make a write syscall, so we interpose the syscall function directly.
 show_cmd "cat ./interpose.c"
 
-echo Unfortunately, it turns out that the libc implementations of these functions make inlined syscalls,
+echo Unfortunately, it turns out that the libc implementations of these functions make *inlined* syscalls,
 echo so this only successfully interposes on and doubles the actual call to syscall:
 show_cmd 'LD_PRELOAD=$PWD/libinterpose.so ./call_write'
 
@@ -29,7 +29,9 @@ echo '[redefine some syscall macros](https://github.com/sporksmith/glibc/commit/
 echo "When using the library as an LD_PRELOAD I initially got some crashes in code that tries to do a dynamic symbol lookup"
 echo "to determine whether it's not the primary libc in use; I worked around by effectively"
 echo '[hard-coding the answer to "yes"](https://github.com/sporksmith/glibc/commit/575ea9f2412905a323cd0c3c380f003bb9e61e67)'
-echo 
-echo "Note that the functions that operate on the stdout file stream actually"
-echo "write to an in-memory buffer. A 'write' syscall happens at the end when the whole buffer is flushed."
+
 show_cmd 'LD_PRELOAD=$PWD/libinterpose.so:$PWD/glibc-build/libc.so ./call_write'
+
+echo 'You may wonder why we don''t see the two, e.g. `fwrite` outputs directly next to each-other.'
+echo 'This is because the functions that operate on the stdout `FILE*` stream, rather than directly on its file descriptor,'
+echo 'write to an in-memory buffer. i.e. the corresponding writes get batched into a single `write` syscall.'
